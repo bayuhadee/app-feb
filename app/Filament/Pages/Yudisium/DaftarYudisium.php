@@ -25,6 +25,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
@@ -44,6 +45,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
     public ?Mahasiswa $mahasiswa = null;
     public $yudisium;
     public $skripsi;
+    public bool $is_locked = false;
     /**
      * Daftar persyaratan file yang harus diupload oleh mahasiswa yudisium.
      *
@@ -103,6 +105,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
         $this->mahasiswa = Auth::user()->mahasiswa ?? null;
         $this->yudisium = $this->mahasiswa->yudisium ?? null;
         $this->skripsi = $this->mahasiswa->skripsi ?? null;
+        $this->is_locked = $this->mahasiswa ? true : false;
         $this->textWa = '[FE WARMADEWA] Pendaftaran YUDISIUM mhs. atas NAMA: ' . ($this->mahasiswa->Nama ?? null) . ' NPM: ' . ($this->mahasiswa->NPM ?? null) . '   untuk divalidasi. Terimakasih';
         $this->form->fill($this->yudisium?->attributesToArray());
     }
@@ -117,7 +120,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 Wizard::make([
                     Step::make('Mahasiswa')
                         ->description('Isi data untuk memeriksa kelulusan tugas akhir.')
-                        ->afterValidation(function (Get $get) {
+                        ->afterValidation(function (Set $set, Get $get) {
                             $mahasiswa = Mahasiswa::with('skripsi', 'yudisium')
                                 ->where('NPM', $get('check_NPM'))
                                 ->where('Jurusan', $get('check_Jurusan'))
@@ -128,11 +131,32 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                             if (! $mahasiswa) {
                                 Notification::make()
                                     ->title('Data mahasiswa tidak ditemukan!')
-                                    ->body('Harap periksa kembali NPM, dan Tanggal Lahir Anda.')
+                                    ->body('Harap periksa kembali NPM dan Jurusan Anda.')
                                     ->danger()
                                     ->send();
 
                                 throw new Halt();
+                            }
+
+                            if (! $this->mahasiswa) {
+                                Auth::user()->update([
+                                    'NPM' => $get('check_NPM'),
+                                ]);
+                                Auth::user()->refresh();
+                                $mahasiswa->update([
+                                    'Email' => Auth::user()->email
+                                ]);
+                                Notification::make()
+                                    ->title('Data berhasil tersimpan!')
+                                    ->body('NPM Anda telah terhubung dengan akun ini.')
+                                    ->success()
+                                    ->send();
+
+                                $this->mahasiswa = Auth::user()->mahasiswa;
+                                $this->skripsi = $this->mahasiswa->skripsi ?? null;
+                                $this->yudisium = $this->mahasiswa->yudisium ?? null;
+                                $this->is_locked = true;
+                                $this->dispatch('$refresh');
                             }
 
                             // Jika belum skripsi
@@ -145,16 +169,6 @@ class DaftarYudisium extends Page implements HasForms, HasActions
 
                                 throw new Halt();
                             }
-
-                            if (! $this->mahasiswa) {
-                                Auth::user()->update([
-                                    'NPM' => $get('check_NPM'),
-                                ]);
-                                Auth::user()->refresh();
-                            }
-                            $this->mahasiswa = Auth::user()->mahasiswa;
-                            $this->skripsi = $this->mahasiswa->skripsi ?? null;
-                            $this->yudisium = $this->mahasiswa->yudisium ?? null;
 
                             // Refill form agar step berikutnya update datanya
                             // $this->form->model($this->yudisium)->fill();
@@ -368,7 +382,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 ->required()
                 ->numeric()
                 ->columnSpanFull()
-                ->disabled(fn($record) => $record ? true : false)
+                ->disabled(fn() => $this->is_locked)
                 ->afterStateHydrated(function ($set, $record) {
                     $set('check_NPM', $this->mahasiswa->NPM ?? null);
                 }),
@@ -382,6 +396,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                     'AKUNTANSI PERPAJAKAN' => 'AKUNTANSI PERPAJAKAN',
                 ])
                 ->required()
+                ->disabled(fn() => $this->is_locked)
                 ->afterStateHydrated(function ($set, $record) {
                     if (!$record || $this->mahasiswa) {
                         $set('check_Jurusan', strtoupper($this->mahasiswa->Jurusan ?? null));
@@ -532,6 +547,8 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                         ->label('Email')
                         ->email()
                         ->required()
+                        ->disabled()
+                        ->dehydrated(true)
                         ->afterStateHydrated(function ($set, $record) {
                             if (!$record) {
                                 $set('email', Auth::user()->email);
