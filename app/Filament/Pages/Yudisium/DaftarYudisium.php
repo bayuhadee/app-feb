@@ -234,7 +234,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                     // 'nama_op_validasi' => $state['data'],
                                     // 'password' => $state['data'],
                                     'v2' => 0,
-                                    'tgl_disetujui' => now(),
+                                    'tgl_disetujui' => '0000-00-00 00:00:00',
                                 ]
                             );
                             // $this->form->model($this->yudisium)->fill();

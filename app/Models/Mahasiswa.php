@@ -27,4 +27,9 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(User::class, 'NPM',  'NPM');
     }
+
+    public function userGmail()
+    {
+        return $this->hasOne(User::class, 'email',  'Email');
+    }
 }
