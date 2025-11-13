@@ -33,7 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             // ->path('admin')
             ->favicon(asset('assets/images/yudisium-fewarmadewa.png'))
-            ->brandLogo(asset('assets/images/yudisium-fewarmadewa.png'))
+            ->brandLogo(asset('https://febwarmadewa.ac.id/wp-content/uploads/2025/06/LOGO-FEB-warmadewa.png'))
             ->brandLogoHeight('7rem')
             ->login(LoginPage::class)
             // ->registration()
