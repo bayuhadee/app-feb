@@ -5,7 +5,7 @@
         <div class="w-full md:w-2/3">
           <div class="p-6">
             <p class="text-sm text-gray-500 dark:text-gray-200 mb-3">
-              Pendaftaran Yudisium FE Universitas Warmadewa
+              Pendaftaran Yudisium FEB Universitas Warmadewa
             </p>
             <h5 class="text-xl font-semibold mb-3 text-black dark:text-white">
               Selamat datang, {{ auth()->user()->name }}

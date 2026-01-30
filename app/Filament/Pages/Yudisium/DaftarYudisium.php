@@ -8,6 +8,7 @@ use Filament\Pages\Page;
 use App\Models\Mahasiswa;
 use Filament\Actions\Action;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\DB;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -123,8 +124,9 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                         ->afterValidation(function (Set $set, Get $get) {
                             $mahasiswa = Mahasiswa::with('skripsi', 'yudisium')
                                 ->where('NPM', $get('check_NPM'))
-                                ->where('Jurusan', $get('check_Jurusan'))
+                                // ->where('Jurusan', $get('check_Jurusan'))
                                 // ->where('NoTelp', $get('check_NoTelp'))
+                                ->orderBy('id', 'DESC')
                                 ->first();
 
                             // Jika data tidak ditemukan
@@ -187,56 +189,95 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                         ->description('Lengkapi biodata pribadi Anda dengan benar.')
                         ->afterValidation(function (Get $get, $livewire) {
                             $state = $livewire->form->getState();
-                            $this->yudisium = Yudisium::updateOrCreate(
-                                [
-                                    'NPM' => $state['NPM'],
-                                ],
-                                [
-                                    'nama' => $state['nama'],
-                                    'ttl' => $state['ttl'],
-                                    'prodi' => $state['prodi'],
-                                    'agama' => $state['agama'],
-                                    'jenis_kelamin' => $state['jenis_kelamin'],
-                                    'asal' => $state['asal'],
-                                    'alamat' => $state['alamat'],
-                                    'nama_orangtua' => $state['nama_orangtua'],
-                                    'nomor_hp' => $state['nomor_hp'],
-                                    'nomor_wa' => $state['nomor_wa'],
-                                    'email' => $state['email'],
-                                    'tanggal_lulus' => $state['tanggal_lulus'],
-                                    'ipk' => $state['ipk'],
-                                    'predikat_lulus' => $state['predikat_lulus'],
-                                    'judul' => $state['judul'],
-                                    'bekerja' => $state['bekerja'],
-                                    'pekerjaan' => $state['pekerjaan'] ?? null,
-                                    'nama_kantor' => $state['nama_kantor'] ?? null,
-                                    'alamat_kantor' => $state['alamat_kantor'] ?? null,
-                                    'telp_kantor' => $state['telp_kantor'] ?? null,
-                                    'tambahan_keterampilan' => $state['keterampilan'],
-                                    // 'foto_slide' => $state['foto_slide'],
-                                    // 'foto_biodata' => $state['foto_biodata'],
-                                    'tempat_penelitian' => $state['tempat_penelitian'],
-                                    'alamat_penelitian' => $state['alamat_penelitian'],
-                                    'nomor_sk' => $state['nomor_sk'],
-                                    'tgl_sk' => $state['tgl_sk'],
-                                    'tgl_daftar' => now(),
-                                    // 'file_skripsi' => $state['file_skripsi'],
-                                    // 'file_jurnal' => $state['file_jurnal'],
-                                    // 'status_verifikasi' => $state['status_verifikasi'],
-                                    // 'keterangan' => $state['keterangan'],
-                                    // 'file_kwitansi' => $state['file_kwitansi'],
-                                    // 'tgl_update' => $state['tgl_update'],
-                                    // 'ids' => $state['ids'],
-                                    // 'file_pppm' => $state['data'],
-                                    // 'file_toefle' => $state['data'],
-                                    // 'ip_address' => $state['data'],
-                                    // 'id_op_validasi' => $state['data'],
-                                    // 'nama_op_validasi' => $state['data'],
-                                    // 'password' => $state['data'],
-                                    'v2' => 0,
-                                    'tgl_disetujui' => '0000-00-00 00:00:00',
-                                ]
-                            );
+
+                            // 1. Ambil data atau buat instance baru
+                            $yudisium = Yudisium::firstOrNew([
+                                'NPM' => $state['NPM'],
+                            ]);
+
+                            // Cek apakah ini data lama (Update) atau data baru (Insert)
+                            $isUpdate = $yudisium->exists;
+
+                            // 2. Isi data dari Form
+                            $yudisium->fill([
+                                'nama' => $state['nama'],
+                                'ttl' => $state['ttl'],
+                                'prodi' => $state['prodi'],
+                                'agama' => $state['agama'],
+                                'jenis_kelamin' => $state['jenis_kelamin'],
+                                'asal' => $state['asal'],
+                                'alamat' => $state['alamat'],
+                                'nama_orangtua' => $state['nama_orangtua'],
+                                'nomor_hp' => $state['nomor_hp'],
+                                'nomor_wa' => $state['nomor_wa'],
+                                'email' => $state['email'],
+                                'tanggal_lulus' => $state['tanggal_lulus'],
+                                'ipk' => $state['ipk'],
+                                'predikat_lulus' => $state['predikat_lulus'],
+                                'judul' => $state['judul'],
+                                'bekerja' => $state['bekerja'],
+                                'pekerjaan' => $state['pekerjaan'] ?? null,
+                                'nama_kantor' => $state['nama_kantor'] ?? null,
+                                'alamat_kantor' => $state['alamat_kantor'] ?? null,
+                                'telp_kantor' => $state['telp_kantor'] ?? null,
+                                'tambahan_keterampilan' => $state['keterampilan'],
+                                'tempat_penelitian' => $state['tempat_penelitian'],
+                                'alamat_penelitian' => $state['alamat_penelitian'],
+                                'nomor_sk' => $state['nomor_sk'],
+                                'tgl_sk' => $state['tgl_sk'],
+                            ]);
+
+                            // 3. Logic Tanggal & Default
+                            if (empty($yudisium->tgl_disetujui) || $yudisium->tgl_disetujui == '0000-00-00 00:00:00') {
+                                $yudisium->tgl_disetujui = '0000-00-00 00:00:00';
+                            }
+
+                            if (!$yudisium->tgl_daftar) {
+                                $yudisium->tgl_daftar = now();
+                            }
+
+                            if (!isset($yudisium->v2)) {
+                                $yudisium->v2 = 0;
+                            }
+
+                            // 4. GENERATE MANUAL SQL QUERY (Hanya jika Update)
+                            if ($isUpdate) {
+                                $setClauses = [];
+
+                                // Loop semua atribut yang sudah di-fill
+                                foreach ($yudisium->getAttributes() as $column => $value) {
+                                    // Skip kolom sistem
+                                    if (in_array($column, ['id', 'created_at', 'updated_at'])) continue;
+
+                                    // Handle NULL dan Escape String
+                                    if (is_null($value)) {
+                                        $valSql = "NULL";
+                                    } else {
+                                        // addslashes penting untuk mencegah error jika ada tanda kutip di nama/judul
+                                        $valSql = "'" . addslashes((string)$value) . "'";
+                                    }
+
+                                    $setClauses[] = "`$column` = $valSql";
+                                }
+
+                                // Rakit String
+                                $rawSql = "UPDATE tbyudisium SET " . PHP_EOL .
+                                    implode(", " . PHP_EOL, $setClauses) . PHP_EOL .
+                                    "WHERE NPM = '" . $state['NPM'] . "'";
+
+                                // Simpan ke Log
+                                DB::table('tbupdate')->insert([
+                                    'qry' => $rawSql,
+                                    'ses' => session()->getId(),
+                                    'npm' => $state['NPM'],
+                                ]);
+                            }
+
+                            // 5. Simpan Data Utama
+                            $yudisium->save();
+                            // Assign ke variable global class jika perlu
+                            $this->yudisium = $yudisium;
+
                             // $this->form->model($this->yudisium)->fill();
                             // $this->yudisium->refresh();
                             $this->form->fill($this->yudisium?->attributesToArray());
@@ -386,22 +427,22 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 ->afterStateHydrated(function ($set, $record) {
                     $set('check_NPM', $this->mahasiswa->NPM ?? null);
                 }),
-            Select::make('check_Jurusan')
-                ->label('Program Studi')
-                ->inlineLabel()
-                ->options([
-                    'AKUNTANSI' => 'AKUNTANSI',
-                    'MANAJEMEN' => 'MANAJEMEN',
-                    'IESP' => 'IESP',
-                    'AKUNTANSI PERPAJAKAN' => 'AKUNTANSI PERPAJAKAN',
-                ])
-                ->required()
-                ->disabled(fn() => $this->is_locked)
-                ->afterStateHydrated(function ($set, $record) {
-                    if (!$record || $this->mahasiswa) {
-                        $set('check_Jurusan', strtoupper($this->mahasiswa->Jurusan ?? null));
-                    }
-                }),
+            // Select::make('check_Jurusan')
+            //     ->label('Program Studi')
+            //     ->inlineLabel()
+            //     ->options([
+            //         'AKUNTANSI' => 'AKUNTANSI',
+            //         'MANAJEMEN' => 'MANAJEMEN',
+            //         'IESP' => 'IESP',
+            //         'AKUNTANSI PERPAJAKAN' => 'AKUNTANSI PERPAJAKAN',
+            //     ])
+            //     ->required()
+            //     ->disabled(fn() => $this->is_locked)
+            //     ->afterStateHydrated(function ($set, $record) {
+            //         if (!$record || $this->mahasiswa) {
+            //             $set('check_Jurusan', strtoupper($this->mahasiswa->Jurusan ?? null));
+            //         }
+            //     }),
             // DatePicker::make('check_TglLahir')
             //     ->label('Tanggal Lahir')
             //     ->inlineLabel()
@@ -727,8 +768,11 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             ->color('gray')
             ->size('xs')
             ->media(function (array $arguments) {
-                $yudisium = $this->yudisium[$arguments['field']] ?? null;
-                return url('storage/' . $yudisium);
+                $path = $this->yudisium[$arguments['field']] ?? null;
+                if (filter_var($path, FILTER_VALIDATE_URL)) {
+                    return $path;
+                }
+                return asset('storage/' . $path);
             });
     }
 
@@ -745,7 +789,8 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             ->link()
             ->media(function (array $arguments) {
                 $yudisium = $arguments['field'] ?? null;
-                return asset($yudisium);
+                return $yudisium;
+                // return asset($yudisium);
             });
     }
 
@@ -769,7 +814,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             })
             ->action(function (array $data, array $arguments) {
                 $this->yudisium->update([
-                    $arguments['field'] => $data['upload']
+                    $arguments['field'] => url('storage/' . $data['upload'])
                 ]);
                 $this->yudisium->refresh();
                 $this->dispatch('refreshUploadTable');
