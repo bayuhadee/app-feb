@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Biodata Wisudawan</title>
-    <link rel="icon" type="image/png" href="{{ asset('assets/images/yudisium-fewarmadewa.png') }}" />
+    <link rel="icon" type="image/png" href="https://feb.warmadewa.ac.id/wp-content/uploads/2025/11/LOGO-FEB-warmadewa.png" />
   </head>
 
   <body style="font-family:Calibri; font-size:14px" onload="doPrint()">
