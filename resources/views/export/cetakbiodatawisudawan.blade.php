@@ -30,7 +30,7 @@
         <td>&nbsp;</td>
       </tr>
     </table>
-    <div align="center" style="position:fixed; right:0px; top:200px;"><img src="{{ url('storage') . '/' . $data->foto_biodata }}" style="width:143px; height:211px"></div>
+    <div align="center" style="position:fixed; right:0px; top:200px;"><img src="{{ filter_var($data->foto_biodata, FILTER_VALIDATE_URL) ? $data->foto_biodata : asset('storage/' . $data->foto_biodata) }}" style="width:143px; height:211px"></div>
     <table width="100%" border="0" style="border-collapse:collapse; margin-top:10px">
       <tr>
         <td width="37%">NAMA LENGKAP</td>

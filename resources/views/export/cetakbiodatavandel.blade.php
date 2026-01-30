@@ -9,7 +9,7 @@
 
   <body style="font-family:Calibri; font-size:14px" onload="doPrint()">
     <H1 align="center">BIODATA VANDEL</H1>
-    <div align="center" style="position:fixed; right:50px; top:25px;"><img src="{{ url('storage') . '/' . $data->foto_biodata }}" style="width:83px; height:113px"></div>
+    <div align="center" style="position:fixed; right:50px; top:25px;"><img src="{{ filter_var($data->foto_biodata, FILTER_VALIDATE_URL) ? $data->foto_biodata : asset('storage/' . $data->foto_biodata) }}" style="width:83px; height:113px"></div>
     <table width="100%" border="0" style="border-collapse:collapse; margin-top:10px">
       <tr>
         <td width="37%">NAMA LENGKAP</td>
