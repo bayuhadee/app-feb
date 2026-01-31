@@ -1,4 +1,4 @@
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
   <h2 class="text-xl font-semibold mb-4">Persyaratan Yudisium</h2>
 
   <div class="overflow-x-auto rounded-lg border border-gray-300">

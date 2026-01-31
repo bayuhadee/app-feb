@@ -133,7 +133,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                             if (! $mahasiswa) {
                                 Notification::make()
                                     ->title('Data mahasiswa tidak ditemukan!')
-                                    ->body('Harap periksa kembali NPM dan Jurusan Anda.')
+                                    ->body('Harap periksa kembali NPM Anda.')
                                     ->danger()
                                     ->send();
 
@@ -293,6 +293,23 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                     Step::make('Persyaratan Yudisium')
                         ->description('Unggah semua berkas yang diperlukan.')
                         ->afterValidation(function (Get $get, $livewire) {
+                            if (! $this->yudisium) {
+                                Notification::make()
+                                    ->title('Data yudisium tidak ditemukan!')
+                                    ->warning()
+                                    ->send();
+                                throw new Halt();
+                            }
+                            $yudisium = $this->yudisium;
+                            $reqFile = $yudisium->file_skripsi && $yudisium->file_jurnal && $yudisium->file_kwitansi && $yudisium->file_pppm && $yudisium->file_toefle && $yudisium->foto_slide && $yudisium->foto_biodata;
+                            if (! $reqFile) {
+                                Notification::make()
+                                    ->title('Berkas belum lengkap!')
+                                    ->body('Silahkan lengkapi berkas yang diperlukan terlebih dahulu!')
+                                    ->warning()
+                                    ->send();
+                                throw new Halt();
+                            }
                             if (intval($this->yudisium->status_verifikasi) == 1) {
                                 Notification::make()
                                     ->title('Menunggu verifikasi!')
@@ -303,8 +320,8 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                             }
                             if (intval($this->yudisium->status_verifikasi) == 0) {
                                 Notification::make()
-                                    ->title('Menunggu verifikasi!')
-                                    ->body('File akan diverifikasi terlebih dahulu. informasi selanjutnya akan dikirim melalui Whatsapp atau silahkan akses halaman ini secara berkala.')
+                                    ->title('Berkas belum diajukan!')
+                                    ->body('Silakan ajukan berkas yang telah Anda lampirkan untuk diverifikasi dengan mengeklik tombol "Kirim Permintaan Verifikasi Berkas"')
                                     ->info()
                                     ->send();
                                 throw new Halt();
@@ -350,12 +367,29 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                             ->button()
                                             ->color('info')
                                             ->icon('heroicon-o-arrow-top-right-on-square')
-                                            ->url(function () {
-                                                $this->textWa = '[FE WARMADEWA] Pendaftaran YUDISIUM mhs. atas NAMA: ' . ($this->mahasiswa->Nama ?? null) . ' NPM: ' . ($this->mahasiswa->NPM ?? null) . '   untuk divalidasi. Terimakasih';
-                                                return url('https://api.whatsapp.com/send/?phone=6287860960870&text=' . $this->textWa);
+                                            ->action(function () {
+                                                // 1. Update Status Verifikasi (Dilakukan di Server)
+                                                $this->yudisium->update([
+                                                    'status_verifikasi' => 1
+                                                ]);
+
+                                                // 2. Kirim Notifikasi
+                                                Notification::make()
+                                                    ->title('Menunggu verifikasi!')
+                                                    ->body('File akan diverifikasi terlebih dahulu. Informasi selanjutnya akan dikirim melalui Whatsapp.')
+                                                    ->info()
+                                                    ->send();
+
+                                                // 3. Siapkan Link WhatsApp
+                                                $nama = $this->mahasiswa->Nama ?? '';
+                                                $npm  = $this->mahasiswa->NPM ?? '';
+
+                                                $textWa = "[FEB WARMADEWA] Pendaftaran YUDISIUM mhs. atas NAMA: {$nama} NPM: {$npm} untuk divalidasi. Terimakasih";
+
+                                                // Gunakan urlencode agar karakter spasi/spesial aman di URL
+                                                $targetUrl = 'https://api.whatsapp.com/send/?phone=6287860960870&text=' . urlencode($textWa);
+                                                return redirect()->away($targetUrl);
                                             })
-                                            ->outlined()
-                                            ->openUrlInNewTab(),
                                     ])->fullWidth(),
                                 ])
                         ]),

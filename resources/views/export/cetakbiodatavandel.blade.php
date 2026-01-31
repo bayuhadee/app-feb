@@ -3,7 +3,7 @@
 
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Biodata Vandel</title>
+    <title>Biodata Vandel - {{ $data->NPM }}</title>
     <link rel="icon" type="image/png" href="https://feb.warmadewa.ac.id/wp-content/uploads/2025/11/LOGO-FEB-warmadewa.png" />
   </head>
 

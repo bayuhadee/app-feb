@@ -3,7 +3,7 @@
 
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Biodata Alumni</title>
+    <title>Biodata Alumni - {{ $data->NPM }}</title>
     <link rel="icon" type="image/png" href="https://feb.warmadewa.ac.id/wp-content/uploads/2025/11/LOGO-FEB-warmadewa.png" />
   </head>
 
@@ -18,7 +18,7 @@
         <td align="center" style="font-size:16px"><strong>PANITIA</strong></td>
       </tr>
       <tr>
-        <td align="center"><strong>YUDISIUM DAN LEPAS PESAN CALON WISUDAWAN KE-79 TH {{ date('Y') }}</strong></td>
+        <td align="center"><strong>YUDISIUM DAN LEPAS PESAN CALON WISUDAWAN KE-{{ $periode_yudisium }} TH {{ date('Y') }}</strong></td>
       </tr>
       <tr>
         <td align="center" style="font-size:16px"><strong>IKATAN KELUARGA ALUMNI FAKULTAS</strong></td>
