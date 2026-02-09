@@ -10,6 +10,7 @@
         "filament/filament": "~4.0",
         "hugomyb/filament-media-action": "^4.1",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "swisnl/filament-backgrounds": "^2.0"
