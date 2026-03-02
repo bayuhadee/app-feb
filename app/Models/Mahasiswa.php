@@ -15,7 +15,7 @@ class Mahasiswa extends Model
 
     public function skripsi()
     {
-        return $this->hasOne(Skripsi::class, 'idMhs',  'id');
+        return $this->hasOne(Skripsi::class, 'NPM',  'NPM');
     }
 
     public function yudisium()
