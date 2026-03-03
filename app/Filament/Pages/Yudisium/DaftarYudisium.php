@@ -603,6 +603,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                     TextInput::make('nomor_hp')
                         ->label('Nomor HP')
                         ->required()
+                        ->belowContent('Contoh: 081234567890')
                         ->afterStateHydrated(function ($set, $record) {
                             if (!$record && $this->mahasiswa) {
                                 $set('nomor_hp', $this->mahasiswa->NoTelp ?? null);
@@ -612,6 +613,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                     TextInput::make('nomor_wa')
                         ->label('Nomor Whatsapp')
                         ->required()
+                        ->belowContent('Contoh: 081234567890')
                         ->afterStateHydrated(function ($set, $record) {
                             if (!$record && $this->mahasiswa) {
                                 $set('nomor_wa', $this->mahasiswa->NoTelp ?? null);
