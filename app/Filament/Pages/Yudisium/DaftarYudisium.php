@@ -457,7 +457,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 ->required()
                 ->numeric()
                 ->columnSpanFull()
-                ->disabled(fn() => $this->is_locked)
+                // ->disabled(fn() => $this->is_locked)
                 ->afterStateHydrated(function ($set, $record) {
                     $set('check_NPM', $this->mahasiswa->NPM ?? null);
                 }),
