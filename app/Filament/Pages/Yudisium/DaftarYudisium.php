@@ -140,6 +140,17 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 throw new Halt();
                             }
 
+                            // Jika belum skripsi
+                            if (! $mahasiswa->skripsi) {
+                                Notification::make()
+                                    ->title('Tugas akhir Anda belum selesai!')
+                                    ->body('Anda belum menyelesaikan Tugas Akhir. Silahkan pastikan kelulusan terlebih dahulu.')
+                                    ->danger()
+                                    ->send();
+
+                                throw new Halt();
+                            }
+
                             if (! $this->mahasiswa) {
                                 Auth::user()->update([
                                     'NPM' => $get('check_NPM'),
@@ -159,17 +170,6 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 $this->yudisium = $this->mahasiswa->yudisium ?? null;
                                 $this->is_locked = true;
                                 $this->dispatch('$refresh');
-                            }
-
-                            // Jika belum skripsi
-                            if (! $mahasiswa->skripsi) {
-                                Notification::make()
-                                    ->title('Tugas akhir Anda belum selesai!')
-                                    ->body('Anda belum menyelesaikan Tugas Akhir. Silahkan pastikan kelulusan terlebih dahulu.')
-                                    ->danger()
-                                    ->send();
-
-                                throw new Halt();
                             }
 
                             // Refill form agar step berikutnya update datanya
