@@ -156,9 +156,11 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                     'NPM' => $get('check_NPM'),
                                 ]);
                                 Auth::user()->refresh();
-                                $mahasiswa->update([
-                                    'Email' => Auth::user()->email
-                                ]);
+                                if (! $mahasiswa->Email) {
+                                    $mahasiswa->update([
+                                        'Email' => Auth::user()->email
+                                    ]);
+                                }
                                 Notification::make()
                                     ->title('Data berhasil tersimpan!')
                                     ->body('NPM Anda telah terhubung dengan akun ini.')
@@ -624,8 +626,8 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                         ->label('Email')
                         ->email()
                         ->required()
-                        ->disabled()
-                        ->dehydrated(true)
+                        // ->disabled()
+                        // ->dehydrated(true)
                         ->afterStateHydrated(function ($set, $record) {
                             if (!$record) {
                                 $set('email', Auth::user()->email);
