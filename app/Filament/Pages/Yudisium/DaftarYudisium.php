@@ -389,7 +389,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                                 $textWa = "[FEB WARMADEWA] Pendaftaran YUDISIUM mhs. atas NAMA: {$nama} NPM: {$npm} untuk divalidasi. Terimakasih";
 
                                                 // Gunakan urlencode agar karakter spasi/spesial aman di URL
-                                                $targetUrl = 'https://api.whatsapp.com/send/?phone=6287860960870&text=' . urlencode($textWa);
+                                                $targetUrl = 'https://api.whatsapp.com/send/?phone=6287796924465&text=' . urlencode($textWa);
                                                 return redirect()->away($targetUrl);
                                             })
                                     ])->fullWidth(),
