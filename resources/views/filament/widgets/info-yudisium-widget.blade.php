@@ -10,7 +10,7 @@
         <span class="text-gray-500">{{ $yudisium->keterangan }}</span>
       @elseif ($yudisium && intval($yudisium->status_verifikasi) === 2)
         <span class="text-gray-500">File yang telah anda lampirkan telah disetujui. Silahkan cetak berkas dibawah ini untuk dibawa ke panitia yudisium.</span>
-        <div class="flex space-x-2 mt-3">
+        <div class="fi-ac fi-align-start space-x-2 mt-3">
           <x-filament::button color="danger" icon="heroicon-o-printer" href="{{ route('export.biodata-wisudawan') }}" tag="a" target="_blank">
             Biodata Wisudawan
           </x-filament::button>
