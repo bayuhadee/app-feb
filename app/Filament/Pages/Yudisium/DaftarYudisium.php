@@ -426,6 +426,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 transition: background-color 0.2s;
                 border: none;
                 cursor: pointer;
+                margin-top: 0.5rem;
             ',
                                                 // Menambahkan efek hover sederhana via onmouseover (opsional tapi bagus)
                                                 'onmouseover' => "this.style.backgroundColor='#b91c1c'",
@@ -453,7 +454,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 transition: background-color 0.2s;
                 border: none;
                 cursor: pointer;
-                margin-top: 0.5rem; /* Jarak atas */
+                margin-top: 0.5rem;
             ',
                                                 'onmouseover' => "this.style.backgroundColor='#1d4ed8'",
                                                 'onmouseout' => "this.style.backgroundColor='#2563eb'",
