@@ -442,7 +442,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                                     ->success()
                                                     ->send();
                                             }),
-                                    ])->fullWidth(),
+                                    ]),
                                 ])
                         ]),
                 ])->startOnStep($startStep)
