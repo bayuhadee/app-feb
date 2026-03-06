@@ -403,46 +403,97 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 ->visible($this->yudisium && intval($this->yudisium->status_verifikasi) == 2 ? true : false)
                                 ->schema([
                                     Actions::make([
+                                        // Tombol 1: Biodata Wisudawan (Merah)
                                         Action::make('cetakbiodatawisudawan')
                                             ->label('Biodata Wisudawan')
-                                            ->button()
-                                            ->color('danger')
                                             ->icon('heroicon-o-printer')
                                             ->url(fn(): string => route('export.biodata-wisudawan'))
                                             ->openUrlInNewTab()
-                                            ->after(function () {
-                                                Notification::make()
-                                                    ->title('Berhasil mendownload biodata wisudawan!')
-                                                    ->success()
-                                                    ->send();
-                                            }),
+                                            // Hapus ->color('danger') dan ->button() bawaan agar tidak konflik style
+                                            ->extraAttributes([
+                                                'class' => 'fi-btn', // Kelas dasar agar struktur tetap rapi (opsional)
+                                                'style' => '
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                background-color: #dc2626; /* Warna Merah */
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background-color 0.2s;
+                border: none;
+                cursor: pointer;
+            ',
+                                                // Menambahkan efek hover sederhana via onmouseover (opsional tapi bagus)
+                                                'onmouseover' => "this.style.backgroundColor='#b91c1c'",
+                                                'onmouseout' => "this.style.backgroundColor='#dc2626'",
+                                            ]),
+
+                                        // Tombol 2: Biodata Alumni (Biru)
                                         Action::make('cetakbiodataalumni')
                                             ->label('Biodata Alumni')
-                                            ->button()
-                                            ->color('primary')
                                             ->icon('heroicon-o-printer')
                                             ->url(fn(): string => route('export.biodata-alumni'))
                                             ->openUrlInNewTab()
-                                            ->after(function () {
-                                                Notification::make()
-                                                    ->title('Berhasil mendownload biodata alumni!')
-                                                    ->success()
-                                                    ->send();
-                                            }),
+                                            ->extraAttributes([
+                                                'style' => '
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                background-color: #2563eb; /* Warna Biru */
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background-color 0.2s;
+                border: none;
+                cursor: pointer;
+                margin-top: 0.5rem; /* Jarak atas */
+            ',
+                                                'onmouseover' => "this.style.backgroundColor='#1d4ed8'",
+                                                'onmouseout' => "this.style.backgroundColor='#2563eb'",
+                                            ]),
+
+                                        // Tombol 3: Biodata Vandel (Kuning/Amber)
                                         Action::make('cetakbiodatavandel')
                                             ->label('Biodata Vandel')
-                                            ->button()
-                                            ->color('warning')
                                             ->icon('heroicon-o-printer')
                                             ->url(fn(): string => route('export.biodata-vandel'))
                                             ->openUrlInNewTab()
-                                            ->after(function () {
-                                                Notification::make()
-                                                    ->title('Berhasil mendownload biodata vandel!')
-                                                    ->success()
-                                                    ->send();
-                                            }),
-                                    ]),
+                                            ->extraAttributes([
+                                                'style' => '
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                background-color: #d97706; /* Warna Amber Gelap agar teks putih terbaca */
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background-color 0.2s;
+                border: none;
+                cursor: pointer;
+                margin-top: 0.5rem;
+            ',
+                                                'onmouseover' => "this.style.backgroundColor='#b45309'",
+                                                'onmouseout' => "this.style.backgroundColor='#d97706'",
+                                            ]),
+                                    ])
+                                        // Mengatur container utama agar tombol tersusun rapi
+                                        ->extraAttributes([
+                                            'style' => '
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    '
+                                        ]),
                                 ])
                         ]),
                 ])->startOnStep($startStep)

@@ -10,16 +10,36 @@
         <span class="text-gray-500">{{ $yudisium->keterangan }}</span>
       @elseif ($yudisium && intval($yudisium->status_verifikasi) === 2)
         <span class="text-gray-500">File yang telah anda lampirkan telah disetujui. Silahkan cetak berkas dibawah ini untuk dibawa ke panitia yudisium.</span>
-        <div class="fi-ac fi-align-start space-x-2 mt-3">
-          <x-filament::button color="danger" icon="heroicon-o-printer" href="{{ route('export.biodata-wisudawan') }}" tag="a" target="_blank">
-            Biodata Wisudawan
-          </x-filament::button>
-          <x-filament::button color="primary" icon="heroicon-o-printer" href="{{ route('export.biodata-alumni') }}" tag="a" target="_blank">
-            Biodata Alumni
-          </x-filament::button>
-          <x-filament::button color="warning" icon="heroicon-o-printer" href="{{ route('export.biodata-vandel') }}" tag="a" target="_blank">
-            Biodata Vandel
-          </x-filament::button>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; align-items: flex-start;">
+
+          {{-- Tombol 1: Biodata Wisudawan (Merah #dc2626) --}}
+          <a href="{{ route('export.biodata-wisudawan') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; column-gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background-color: #dc2626; border-radius: 8px; text-decoration: none; border: none;">
+
+            {{-- Ikon: Pastikan width/height diatur di sini --}}
+            <div style="width: 20px; height: 20px; display: flex; align-items: center;">
+              <x-heroicon-o-printer style="width: 100%; height: 100%;" />
+            </div>
+            <span>Biodata Wisudawan</span>
+          </a>
+
+          {{-- Tombol 2: Biodata Alumni (Biru #2563eb) --}}
+          <a href="{{ route('export.biodata-alumni') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; column-gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background-color: #2563eb; border-radius: 8px; text-decoration: none; border: none;">
+
+            <div style="width: 20px; height: 20px; display: flex; align-items: center;">
+              <x-heroicon-o-printer style="width: 100%; height: 100%;" />
+            </div>
+            <span>Biodata Alumni</span>
+          </a>
+
+          {{-- Tombol 3: Biodata Vandel (Kuning/Amber #f59e0b) --}}
+          <a href="{{ route('export.biodata-vandel') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; column-gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background-color: #f59e0b; border-radius: 8px; text-decoration: none; border: none;">
+
+            <div style="width: 20px; height: 20px; display: flex; align-items: center;">
+              <x-heroicon-o-printer style="width: 100%; height: 100%;" />
+            </div>
+            <span>Biodata Vandel</span>
+          </a>
+
         </div>
       @elseif ($yudisium && intval($yudisium->status_verifikasi) === 1)
         <span class="text-gray-500">File akan diverifikasi terlebih dahulu. informasi selanjutnya akan dikirim melalui Whatsapp atau silahkan akses halaman ini secara berkala.</span>

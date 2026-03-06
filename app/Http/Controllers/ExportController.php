@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 class ExportController extends Controller
 {
     public $periodeYudisium;
+
     public function __construct()
     {
         $this->periodeYudisium = DB::table('tbsetyudisium')->first()->periode_yudisium;
     }
+
     public function cetakBiodataWisudawan()
     {
         $yudisium = Yudisium::where('NPM', Auth::user()->mahasiswa->NPM)->first();
