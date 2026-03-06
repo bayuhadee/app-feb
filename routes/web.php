@@ -15,8 +15,15 @@ Route::get('/clear-cache', function () {
     return "Clear Success";
 });
 
+Route::get('/auth', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');
+
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('socialite.redirect');
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('socialite.callback');
-Route::get('/export/biodata-wisudawan', [ExportController::class, 'cetakBiodataWisudawan'])->name('export.biodata-wisudawan');
-Route::get('/export/biodata-alumni', [ExportController::class, 'cetakBiodataAlumni'])->name('export.biodata-alumni');
-Route::get('/export/biodata-vandel', [ExportController::class, 'cetakBiodataVandel'])->name('export.biodata-vandel');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/export/biodata-wisudawan', [ExportController::class, 'cetakBiodataWisudawan'])->name('export.biodata-wisudawan');
+    Route::get('/export/biodata-alumni', [ExportController::class, 'cetakBiodataAlumni'])->name('export.biodata-alumni');
+    Route::get('/export/biodata-vandel', [ExportController::class, 'cetakBiodataVandel'])->name('export.biodata-vandel');
+});

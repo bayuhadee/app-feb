@@ -17,7 +17,14 @@ class ExportController extends Controller
 
     public function cetakBiodataWisudawan()
     {
+        if (!Auth::user()->mahasiswa) {
+            abort(403, 'Akun Anda tidak terhubung dengan data mahasiswa.');
+        }
+
         $yudisium = Yudisium::where('NPM', Auth::user()->mahasiswa->NPM)->first();
+        if (!$yudisium || intval($yudisium->status_verifikasi) !== 2) {
+            abort(403, 'Akses Ditolak: Berkas Anda belum disetujui.');
+        }
 
         return view('export.cetakbiodatawisudawan', [
             'data' => $yudisium,
@@ -27,7 +34,14 @@ class ExportController extends Controller
 
     public function cetakBiodataAlumni()
     {
+        if (!Auth::user()->mahasiswa) {
+            abort(403, 'Akun Anda tidak terhubung dengan data mahasiswa.');
+        }
+
         $yudisium = Yudisium::where('NPM', Auth::user()->mahasiswa->NPM)->first();
+        if (!$yudisium || intval($yudisium->status_verifikasi) !== 2) {
+            abort(403, 'Akses Ditolak: Berkas Anda belum disetujui.');
+        }
 
         return view('export.cetakbiodataalumni', [
             'data' => $yudisium,
@@ -37,7 +51,14 @@ class ExportController extends Controller
 
     public function cetakBiodataVandel()
     {
+        if (!Auth::user()->mahasiswa) {
+            abort(403, 'Akun Anda tidak terhubung dengan data mahasiswa.');
+        }
+
         $yudisium = Yudisium::where('NPM', Auth::user()->mahasiswa->NPM)->first();
+        if (!$yudisium || intval($yudisium->status_verifikasi) !== 2) {
+            abort(403, 'Akses Ditolak: Berkas Anda belum disetujui.');
+        }
 
         return view('export.cetakbiodatavandel', [
             'data' => $yudisium,
