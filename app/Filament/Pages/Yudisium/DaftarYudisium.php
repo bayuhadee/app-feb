@@ -367,7 +367,6 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                         Action::make('reqValidasi')
                                             ->label('Kirim Permintaan Validasi Berkas')
                                             ->button()
-                                            ->color('info')
                                             ->icon('heroicon-o-arrow-top-right-on-square')
                                             ->action(function () {
                                                 // 1. Update Status Verifikasi (Dilakukan di Server)
@@ -392,6 +391,26 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                                 $targetUrl = 'https://api.whatsapp.com/send/?phone=6287796924465&text=' . urlencode($textWa);
                                                 return redirect()->away($targetUrl);
                                             })
+                                            ->extraAttributes([
+                                                'style' => '
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                background-color: #2563eb; /* Warna Biru */
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background-color 0.2s;
+                border: none;
+                cursor: pointer;
+                margin-top: 0.5rem;
+            ',
+                                                'onmouseover' => "this.style.backgroundColor='#1d4ed8'",
+                                                'onmouseout' => "this.style.backgroundColor='#2563eb'",
+                                            ]),
                                     ])->fullWidth(),
                                 ])
                         ]),

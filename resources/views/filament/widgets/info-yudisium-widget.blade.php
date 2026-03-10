@@ -32,7 +32,7 @@
           </a>
 
           {{-- Tombol 3: Biodata Vandel (Kuning/Amber #f59e0b) --}}
-          <a href="{{ route('export.biodata-vandel') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; column-gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background-color: #f59e0b; border-radius: 8px; text-decoration: none; border: none;">
+          <a href="{{ route('export.biodata-vandel') }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; column-gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background-color: #d97706; border-radius: 8px; text-decoration: none; border: none;">
 
             <div style="width: 20px; height: 20px; display: flex; align-items: center;">
               <x-heroicon-o-printer style="width: 100%; height: 100%;" />
