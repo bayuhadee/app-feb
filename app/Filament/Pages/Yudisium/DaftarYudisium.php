@@ -79,11 +79,11 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             'field' => 'file_pppm',
             'accept' => 'application/pdf',
         ],
-        [
-            'label' => 'Kwitansi Sertifikat TOEFL & Transkrip Nilai',
-            'field' => 'file_toefle',
-            'accept' => 'application/pdf',
-        ],
+        // [
+        //     'label' => 'Kwitansi Sertifikat TOEFL & Transkrip Nilai',
+        //     'field' => 'file_toefle',
+        //     'accept' => 'application/pdf',
+        // ],
         [
             'label' => 'Foto Slide',
             'field' => 'foto_slide',
