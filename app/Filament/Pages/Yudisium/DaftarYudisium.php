@@ -303,13 +303,20 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 throw new Halt();
                             }
                             $yudisium = $this->yudisium;
-                            $reqFile = $yudisium->file_skripsi && $yudisium->file_jurnal && $yudisium->file_kwitansi && $yudisium->file_pppm && $yudisium->file_toefle && $yudisium->foto_slide && $yudisium->foto_biodata;
-                            if (! $reqFile) {
+                            $missingFiles = [];
+                            foreach ($this->requirements as $req) {
+                                $field = $req['field'];
+                                if (empty($yudisium->{$field})) {
+                                    $missingFiles[] = $req['label'];
+                                }
+                            }
+                            if (count($missingFiles) > 0) {
                                 Notification::make()
                                     ->title('Berkas belum lengkap!')
-                                    ->body('Silahkan lengkapi berkas yang diperlukan terlebih dahulu!')
+                                    ->body('Silakan lengkapi file berikut terlebih dahulu: ' . implode(', ', $missingFiles))
                                     ->warning()
                                     ->send();
+
                                 throw new Halt();
                             }
                             if (intval($this->yudisium->status_verifikasi) == 1) {
