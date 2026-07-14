@@ -39,6 +39,7 @@
                   'field' => $item['field'],
                   'label' => $item['label'],
                   'accept' => $item['accept'] ?? 'application/pdf',
+                  'maxSize' => $item['maxSize'] ?? 2048,
               ]) }}
             </td>
 

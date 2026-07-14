@@ -63,32 +63,38 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             'label' => 'File Skripsi (PDF)',
             'field' => 'file_skripsi',
             'accept' => 'application/pdf',
+            'maxSize' => 10240,
         ],
         [
             'label' => 'File Jurnal (PDF)',
             'field' => 'file_jurnal',
             'accept' => 'application/pdf',
+            'maxSize' => 10240,
         ],
         [
             'label' => 'Kwitansi Pembayaran Yudisium',
             'field' => 'file_kwitansi',
-            'accept' => 'application/pdf',
+            'accept' => 'application/pdf,image/jpeg,image/png,image/jpg',
+            'maxSize' => 2048,
         ],
         [
             'label' => 'Kwitansi Pembayaran PPPM',
             'field' => 'file_pppm',
-            'accept' => 'application/pdf',
+            'accept' => 'application/pdf,image/jpeg,image/png,image/jpg',
+            'maxSize' => 2048,
         ],
         [
             'label' => 'Transkrip Nilai',
             'field' => 'file_toefle',
             'accept' => 'application/pdf',
+            'maxSize' => 10240,
         ],
         [
             'label' => 'Foto Slide',
             'field' => 'foto_slide',
             'accept' => 'image/jpeg,image/png,image/jpg',
             'note' => 'Foto berwarna dengan ketentuan pria memakai full dress dan wanita memakai pakaian nasional.',
+            'maxSize' => 2048,
             'contoh' => 'assets/images/contoh-foto-yudisium-fewarmadewa-wanita.jpg',
         ],
         [
@@ -96,6 +102,7 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             'field' => 'foto_biodata',
             'accept' => 'image/jpeg,image/png,image/jpg',
             'note' => 'Foto hitam putih dengan ketentuan pria memakai full dress dasi panjang dan wanita memakai dasi kupu-kupu.',
+            'maxSize' => 2048,
             'contoh' => 'assets/images/contoh-foto-yudisium-fewarmadewa-biodata.jpg',
         ],
     ];
@@ -368,7 +375,21 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 ->description('File akan diverifikasi terlebih dahulu. informasi selanjutnya akan dikirim melalui Whatsapp atau silahkan akses halaman ini secara berkala.'),
                             Section::make('Menunggu Verifikasi!')
                                 ->description('Periksa kembali semua file dan pastikan semua file berhasi terupload sebelum mengirim permintaan validasi. Silahkan kirim whatsapp dengan klik tombol dibawah ini untuk melanjutkan permintaan validasi.')
-                                ->visible($this->yudisium && (intval($this->yudisium->status_verifikasi) == 0 || intval($this->yudisium->status_verifikasi) == 3) ? true : false)
+                                ->visible(function () {
+                                    if (!$this->yudisium) {
+                                        return false;
+                                    }
+                                    $status = intval($this->yudisium->status_verifikasi);
+                                    if ($status !== 0 && $status !== 3) {
+                                        return false;
+                                    }
+                                    foreach ($this->requirements as $req) {
+                                        if (empty($this->yudisium->{$req['field']})) {
+                                            return false;
+                                        }
+                                    }
+                                    return true;
+                                })
                                 ->schema([
                                     Actions::make([
                                         Action::make('reqValidasi')
@@ -435,9 +456,8 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                             ->icon('heroicon-o-printer')
                                             ->url(fn(): string => route('export.biodata-wisudawan'))
                                             ->openUrlInNewTab()
-                                            // Hapus ->color('danger') dan ->button() bawaan agar tidak konflik style
                                             ->extraAttributes([
-                                                'class' => 'fi-btn', // Kelas dasar agar struktur tetap rapi (opsional)
+                                                'class' => 'fi-btn',
                                                 'style' => '
                 display: inline-flex;
                 align-items: center;
@@ -524,6 +544,29 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                                 ])
                         ]),
                 ])->startOnStep($startStep)
+                    ->persistStepInQueryString()
+                    ->nextAction(
+                        function (Action $action) {
+                            return $action
+                                ->disabled(function () {
+                                    $currentStep = request()->query('step');
+                                    if ($currentStep === 'form.persyaratan-yudisium::data::wizard-step') {
+                                        if (!$this->yudisium) return true;
+                                        $this->yudisium->refresh();
+                                        foreach ($this->requirements as $req) {
+                                            if (empty($this->yudisium->{$req['field']})) {
+                                                return true;
+                                            }
+                                        }
+                                        // if (intval($this->yudisium->status_verifikasi) !== 2) {
+                                        //     return true;
+                                        // }
+                                        return false;
+                                    }
+                                    return false;
+                                });
+                        }
+                    )
             ])
             ->statePath('data');
     }
@@ -918,13 +961,18 @@ class DaftarYudisium extends Page implements HasForms, HasActions
             ->icon('heroicon-o-cloud-arrow-up')
             ->size('xs')
             ->schema(function (array $arguments) {
+                $maxSize = $arguments['maxSize'] ?? 2048;
+                $acceptType = $arguments['accept'] ?? 'application/pdf';
+                $maxSizeInMb = $maxSize / 1024;
                 return [
                     FileUpload::make('upload')
                         ->label('File')
                         ->required()
                         ->disk('public')
                         ->directory('uploads')
-                        ->acceptedFileTypes(explode(',', $arguments['accept'] ?? 'application/pdf'))
+                        ->acceptedFileTypes(explode(',', $acceptType))
+                        ->helperText("Accepted file types: {$acceptType} | Max size: {$maxSizeInMb} MB")
+                        ->maxSize($maxSize)
                         ->downloadable(),
                 ];
             })
@@ -934,8 +982,9 @@ class DaftarYudisium extends Page implements HasForms, HasActions
                 ]);
                 $this->yudisium->refresh();
                 $this->dispatch('refreshUploadTable');
+                $this->dispatch('$refresh');
                 Notification::make()
-                    ->title('File: ' . $arguments['label'] . ' berhasil diupload')
+                    ->title('File: ' . ($arguments['label'] ?? '') . ' berhasil diupload')
                     ->success()
                     ->send();
             });
